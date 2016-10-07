@@ -222,10 +222,10 @@ if (!class_exists('Cpdf', false)) {
                 if (isset($cw[$i])) {
                     $l += $cw[$i];
                 }
-              
+
 
                     if ($l > $wmax) {
-                        break;
+                        break; 
 
                 } else {
                     $i++;
