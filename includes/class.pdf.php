@@ -86,7 +86,22 @@ if (!class_exists('Cpdf', false)) {
             $this->Text($XPos, $this->h - $YPos, $text);// Public function Text() in ~/includes/tcpdf/tcpdf.php.
         }
 
+        function royalKanil($a){
 
+            $ascii = ord(iconv("UTF-8", "TIS-620", $a));
+
+            if( $ascii == 209 ||  ($ascii >= 212 && $ascii <= 218 ) || ($ascii >= 231 && $ascii <= 238 ) ){
+
+                print "yes";
+                return true;
+
+            }else{
+                print "no";
+                return false;
+            }
+
+
+        }
         function utf8_strlen($s)
         {
 
@@ -94,6 +109,56 @@ if (!class_exists('Cpdf', false)) {
             $l = 0;
             for ($i = 0; $i < $c; ++$i) if ((ord($s[$i]) & 0xC0) != 0x80) ++$l;
             return $l;
+        }
+        function getSubStrTH($string, $start, $length)
+        {
+            $length = ($length+$start)-1;
+            $array = getMBStrSplit($string);
+            $count = 0;
+            $return = "";
+
+            for($i=$start; $i < count($array); $i++)
+            {
+                $ascii = ord(iconv("UTF-8", "TIS-620", $array[$i] ));
+
+                if( $ascii == 209 ||  ($ascii >= 212 && $ascii <= 218 ) || ($ascii >= 231 && $ascii <= 238 ) )
+                {
+                    //$start++;
+                    $length++;
+                }
+
+
+
+                if( $i <= $length ) {
+
+                    if ($i >= $start) {
+                        $return .= $array[$i];
+                    }
+
+                }else{
+
+
+                    $j = $i+1;
+                    print $length;
+
+                    while ($this->royalKanil($array[$j])){
+
+                        $length++;
+                        $j++;
+
+                    }
+
+                    //$return .= $array[$j];
+
+                    print $length;
+
+                    break;
+
+                }
+
+            }
+
+            return $return;
         }
 
         function getMBStrSplit($string, $split_length = 1){
@@ -186,6 +251,11 @@ if (!class_exists('Cpdf', false)) {
 
             $s = trim($s) . ' ';
 //            $nb = mb_strlen($s);
+
+
+
+
+
             $nb = $this->getStrLenTH($s)+1;
 //            $nb = 1000;
 
@@ -225,7 +295,7 @@ if (!class_exists('Cpdf', false)) {
 
 
                     if ($l > $wmax) {
-                        break; 
+                        break;
 
                 } else {
                     $i++;
@@ -247,6 +317,149 @@ if (!class_exists('Cpdf', false)) {
                     $this->_out(sprintf('%.3f Tw', $this->ws * $this->k));
                 }
             }
+
+            $sep=10;
+//
+            $this->Cell($Width, $Height, mb_substr($s, 0, $sep), $b, 2, $Align, $fill);
+//            $this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
+            $this->x = $this->lMargin;
+
+//			print $sep;
+
+            return $this->getSubStrTH($s, $sep);
+//            return mb_substr($s, 4);
+
+
+        }// End function addTextWrap.
+         function addTextWrap2($XPos, $YPos, $Width, $Height, $Text, $Align = 'J', $border = 1, $fill = 0)
+        {
+            // R&OS version 0.12.2: "addTextWrap function is no more, use addText instead".
+            /* Returns the balance of the string that could not fit in the width */
+            // $XPos = cell horizontal coordinate from page left side to cell left side in dpi (72dpi = 25.4mm).
+            // $YPos = cell vertical coordinate from page bottom side to cell bottom side in dpi (72dpi = 25.4mm).
+            // $Width = Cell (line) width in dpi (72dpi = 25.4mm).
+            // $Height = Font size in dpi (72dpi = 25.4mm).
+            // $Text = Text to be split in portion to be add to the page and the remainder to be returned.
+            // $Align = 'left', 'center', 'centre', 'full' or 'right'.
+
+            //some special characters are html encoded
+            //this code serves to make them appear human readable in pdf file
+            $Text = html_entity_decode($Text, ENT_QUOTES, 'UTF-8');// Convert all HTML entities to their applicable characters.
+
+            $this->x = $XPos;
+            $this->y = $this->h - $YPos - $Height;//RChacon: This -$Height is the difference in yPos between AddText() and AddTextWarp(). It is better "$this->y = $this->h-$YPos", but that requires to recode all the pdf generator scripts.
+
+            switch ($Align) {// Translate from Pdf-Creator to TCPDF.
+                case 'left':
+                    $Align = 'L';
+                    break;
+                case 'right':
+                    $Align = 'R';
+                    break;
+                case 'center':
+                    $Align = 'C';
+                    break;
+                case 'centre':
+                    $Align = 'C';
+                    break;
+                case 'full':
+                    $Align = 'J';
+                    break;
+                default:
+                    $Align = 'L';
+                    break;
+            }
+            $this->SetFontSize($Height);// Public function SetFontSize() in ~/includes/tcpdf/tcpdf.php.
+
+            if ($Width == 0) {
+                $Width = $this->w - $this->rMargin - $this->x;// Line_width = Page_width - Right_margin - Cell_horizontal_coordinate($XPos).
+            }
+            $wmax = ($Width - 2 * $this->cMargin);
+//            $wmax = 200;
+            $s = str_replace("\r", '', $Text);
+
+            $lnbreakpos = strpos( $s , "\n");
+
+//            $s = str_replace("\n", ' ', $s);
+
+
+
+
+            $s = trim($s) . ' ';
+//            $nb = mb_strlen($s);
+
+
+
+
+
+            $nb = $this->getStrLenTH($s)+1;
+//            $nb = 1000;
+
+            $b = 0;
+            if ($border) {
+                if ($border == 1) {
+                    $border = 'LTRB';
+                    $b = 'LRT';
+                    $b2 = 'LR';
+                } else {
+                    $b2 = '';
+                    if (is_int(mb_strpos($border, 'L'))) {
+                        $b2 .= 'L';
+                    }
+                    if (is_int(mb_strpos($border, 'R'))) {
+                        $b2 .= 'R';
+                    }
+                    $b = is_int(mb_strpos($border, 'T')) ? $b2 . 'T' : $b2;
+                }
+            }
+            $sep = -1;
+            $i = 0;
+            $l = $ls = 0;
+            $ns = 0;
+            $cw = $this->GetStringWidth($s, '', '', 0, true);
+            while ($i < $nb) {
+                /*$c=$s{$i};*/
+                $c = mb_substr($s, $i, 1, 'UTF-8');
+                if ($c == ' ' AND $i > 0) {
+                    $sep = $i;
+                    $ls = $l;
+                    $ns++;
+                }
+                if (isset($cw[$i])) {
+                    $l += $cw[$i];
+                }
+
+
+                    if ($l > $wmax) {
+                        break;
+
+                } elseif ($i>$lnbreakpos){
+
+                        break;
+                    }
+
+                    else {
+                    $i++;
+                }
+            }
+            if ($sep == -1) {
+                if ($i == 0) {
+                    $i++;
+                }
+
+                if (isset($this->ws) and $this->ws > 0) {
+                    $this->ws = 0;
+                    $this->_out('0 Tw');
+                }
+                $sep = $i;
+            } else {
+                if ($Align == 'J') {
+                    $this->ws = ($ns > 1) ? ($wmax - $ls) / ($ns - 1) : 0;
+                    $this->_out(sprintf('%.3f Tw', $this->ws * $this->k));
+                }
+            }
+
+
 
             $this->Cell($Width, $Height, mb_substr($s, 0, $sep), $b, 2, $Align, $fill);
             $this->x = $this->lMargin;
