@@ -113,10 +113,86 @@ if (!class_exists('Cpdf', false)) {
             return $l;
         }
 
+        function getSubStrBaseTH($string, $start, $length)
+        {
+
+            $array = $this->getMBStrSplit($string);
+
+            foreach($array as $value)
+            {
+                $ascii = ord(iconv("UTF-8", "TIS-620", $value ));
+
+                if( !( $ascii == 209 ||  ($ascii >= 212 && $ascii <= 218 ) || ($ascii >= 231 && $ascii <= 238 )) )
+                {
+                    $count += 1;
+
+                    $countstart++;
+                }
+            }
+
+            $start = $countstart;
+
+            if ($length == null) {
+
+                $length = count($array);
+
+            } else {
+                $length = ($length + $start) - 1;
+            }
+
+            $length = ($length + $start) - 1;
+//            $array = $this->getMBStrSplit($string);
+            $count = 0;
+            $return = "";
+
+            for ($i = $start; $i < count($array); $i++) {
+                $ascii = ord(iconv("UTF-8", "TIS-620", $array[$i]));
+
+                if ($ascii == 209 || ($ascii >= 212 && $ascii <= 218) || ($ascii >= 231 && $ascii <= 238)) {
+                    //$start++;
+                    $length++;
+                }
+
+
+                if ($i <= $length) {
+
+                    if ($i >= $start) {
+                        $return .= $array[$i];
+                    }
+
+                } else {
+
+
+                    $j = $i + 1;
+//                    print $length;
+
+                    while ($this->royalKanil($array[$j])) {
+
+                        $length++;
+                        $j++;
+
+                    }
+
+                    //$return .= $array[$j];
+
+//                    print $length;
+
+                    break;
+
+                }
+
+            }
+
+            return $return;
+        }
+
         function getSubStrTH($string, $start, $length)
         {
 
             $array = $this->getMBStrSplit($string);
+
+            foreach($array as $value)
+
 
             if ($length == null) {
 
@@ -205,7 +281,7 @@ if (!class_exists('Cpdf', false)) {
             return $count;
         }
 
-        function addTextWrap2($XPos, $YPos, $Width, $Height, $Text, $Align = 'J', $border = 1, $fill = 0)
+        function addTextWrap2($XPos, $YPos, $Width, $Height, $Text, $Align = 'J', $border = 0, $fill = 0)
         {
             // R&OS version 0.12.2: "addTextWrap function is no more, use addText instead".
             /* Returns the balance of the string that could not fit in the width */
@@ -248,12 +324,12 @@ if (!class_exists('Cpdf', false)) {
             if ($Width == 0) {
                 $Width = $this->w - $this->rMargin - $this->x;// Line_width = Page_width - Right_margin - Cell_horizontal_coordinate($XPos).
             }
-            $wmax = ($Width - 2 * $this->cMargin); // defind width of box
-//            $wmax = 200;
+//            $wmax = ($Width - 2 * $this->cMargin); // defind width of box
+            $wmax = 200;
             $s = str_replace("\r", '', $Text);
 
-            $lnbreakpos = strpos($s, "\n");
-
+//            $lnbreakpos = strpos($s, "\n");
+//
 //            $s = str_replace("\n", ' ', $s);
 
 
@@ -288,7 +364,7 @@ if (!class_exists('Cpdf', false)) {
             $cw = $this->GetStringWidth($s, '', '', 0, true);
             while ($i < $nb) {
                 /*$c=$s{$i};*/
-                $c = mb_substr($s, $i, 1, 'UTF-8');
+                $c = $this->getSubStrTH($s, $i, 1);
                 if ($c == ' ' AND $i > 0) {
                     $sep = $i;
                     $ls = $l;
@@ -322,22 +398,22 @@ if (!class_exists('Cpdf', false)) {
                     $this->_out(sprintf('%.3f Tw', $this->ws * $this->k));
                 }
             }
+            // --set newline length
+            $sep = "100";
 
-//            $sep = 100;
-//
             $this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
 //            $this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
             $this->x = $this->lMargin;
 
 //			print $sep;
 
-            return $this->getSubStrTH($s, $sep);
+            return $this->getSubStrBaseTH($s, $sep);
 //            return mb_substr($s, 4);
 
 
         }// End function addTextWrap.
 
-        function addTextWrap($XPos, $YPos, $Width, $Height, $Text, $Align = 'J', $border = 1, $fill = 0)
+        function addTextWrap($XPos, $YPos, $Width, $Height, $Text, $Align = 'J', $border = 0, $fill = 0)
         {
             // R&OS version 0.12.2: "addTextWrap function is no more, use addText instead".
             /* Returns the balance of the string that could not fit in the width */
@@ -459,10 +535,8 @@ if (!class_exists('Cpdf', false)) {
             $this->Cell($Width, $Height, mb_substr($s, 0, $sep), $b, 2, $Align, $fill);
             $this->x = $this->lMargin;
 
-//			print $sep;
-
             return mb_substr($s, $sep);
-//            return mb_substr("asdasdasd", 4);
+
 
 
         }// End function addTextWrap.
