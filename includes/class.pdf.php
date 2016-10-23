@@ -405,7 +405,7 @@ if (!class_exists('Cpdf', false)) {
 //            $this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
             $this->x = $this->lMargin;
 
-//			print $sep;
+//			print $sep;  woohoo
 
             return $this->getSubStrBaseTH($s, $sep);
 //            return mb_substr($s, 4);
