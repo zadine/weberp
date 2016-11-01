@@ -118,12 +118,10 @@ if (!class_exists('Cpdf', false)) {
 
             $array = $this->getMBStrSplit($string);
 
-            foreach($array as $value)
-            {
-                $ascii = ord(iconv("UTF-8", "TIS-620", $value ));
+            foreach ($array as $value) {
+                $ascii = ord(iconv("UTF-8", "TIS-620", $value));
 
-                if( !( $ascii == 209 ||  ($ascii >= 212 && $ascii <= 218 ) || ($ascii >= 231 && $ascii <= 238 )) )
-                {
+                if (!($ascii == 209 || ($ascii >= 212 && $ascii <= 218) || ($ascii >= 231 && $ascii <= 238))) {
                     $count += 1;
 
                     $countstart++;
@@ -191,16 +189,16 @@ if (!class_exists('Cpdf', false)) {
 
             $array = $this->getMBStrSplit($string);
 
-            foreach($array as $value)
+            foreach ($array as $value)
 
 
-            if ($length == null) {
+                if ($length == null) {
 
-                $length = count($array);
+                    $length = count($array);
 
-            } else {
-                $length = ($length + $start) - 1;
-            }
+                } else {
+                    $length = ($length + $start) - 1;
+                }
 
             $length = ($length + $start) - 1;
 //            $array = $this->getMBStrSplit($string);
@@ -228,6 +226,7 @@ if (!class_exists('Cpdf', false)) {
                     $j = $i + 1;
 //                    print $length;
 
+                    // check ตัวถัดไปว่าเป็ฯ สระบนล่างมั้ย
                     while ($this->royalKanil($array[$j])) {
 
                         $length++;
@@ -330,6 +329,7 @@ if (!class_exists('Cpdf', false)) {
 
 //            $lnbreakpos = strpos($s, "\n");
 //
+            // -- replace \n with space
 //            $s = str_replace("\n", ' ', $s);
 
 
@@ -362,9 +362,24 @@ if (!class_exists('Cpdf', false)) {
             $l = $ls = 0;
             $ns = 0;
             $cw = $this->GetStringWidth($s, '', '', 0, true);
+
+            // check by alphabet for new line
+            $nlf = "zzz";
+
             while ($i < $nb) {
                 /*$c=$s{$i};*/
                 $c = $this->getSubStrTH($s, $i, 1);
+//                $nlf = $this->getSubStrTH($s, $i, 1);
+
+                if (strpos($c, "\n")) {
+
+//                    $s.= $s + " br" ;
+                    $nlf = $i;
+//                    break;
+
+
+                }
+
                 if ($c == ' ' AND $i > 0) {
                     $sep = $i;
                     $ls = $l;
@@ -399,13 +414,27 @@ if (!class_exists('Cpdf', false)) {
                 }
             }
             // --set newline length
-            $sep = "100";
+//            $sep = "4";
 
-            $this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
+            // write to screenn
+
+            if ($nlf) {
+
+//                $this->Cell($Width, $Height, $nlf, $b, 2, $Align, $fill);
+                $this->Cell($Width, $Height, $this->getSubStrTH("บุญอนันต์", 5, 1), $b, 2, $Align, $fill);
+//                $this->Cell($Width, $Height, mb_substr("aaaaasdfsd",5,1), $b, 2, $Align, $fill);
+
+                //$this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
+//                $this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
+            }
+//            $this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
+//            $this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
 //            $this->Cell($Width, $Height, $this->getSubStrTH($s, 0, $sep), $b, 2, $Align, $fill);
             $this->x = $this->lMargin;
 
 //			print $sep;  woohoo
+
+            // send remaind
 
             return $this->getSubStrBaseTH($s, $sep);
 //            return mb_substr($s, 4);
@@ -510,7 +539,7 @@ if (!class_exists('Cpdf', false)) {
                 if ($l > $wmax) {
                     break;
 
-                }  else {
+                } else {
                     $i++;
                 }
             }
@@ -536,7 +565,6 @@ if (!class_exists('Cpdf', false)) {
             $this->x = $this->lMargin;
 
             return mb_substr($s, $sep);
-
 
 
         }// End function addTextWrap.

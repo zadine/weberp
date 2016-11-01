@@ -28,18 +28,19 @@ $pdf->addText(($Page_Width/2) -40 , $Page_Height-$Top_Margin-180, 18, "ใบเ
 
 
 // Prints company info:
-$XPos = $Page_Width/2+$Left_Margin;
-$YPos = 720;
+$XPos = $Page_Width/2+$Left_Margin+50;
+//$YPos = 720;
+$YPos = 800;
 $FontSize = 12;
 $pdf->addText($XPos, $YPos, $FontSize, $_SESSION['CompanyRecord']['coyname']);
 $YPos -= $FontSize;
 $FontSize = 10;
 $pdf->addText($XPos, $YPos, $FontSize, $_SESSION['CompanyRecord']['regoffice1']);
 $pdf->addText($XPos, $YPos-$FontSize*1, $FontSize, $_SESSION['CompanyRecord']['regoffice2']);
-$pdf->addText($XPos, $YPos-$FontSize*2, $FontSize, $_SESSION['CompanyRecord']['regoffice3'] . "aaa");
+$pdf->addText($XPos, $YPos-$FontSize*2, $FontSize, $_SESSION['CompanyRecord']['regoffice3'] ." ". $_SESSION['CompanyRecord']['regoffice5'] );
 $pdf->addText($XPos, $YPos-$FontSize*3, $FontSize, $_SESSION['CompanyRecord']['regoffice4']);
-$pdf->addText($XPos, $YPos-$FontSize*4, $FontSize, $_SESSION['CompanyRecord']['regoffice5'] .
-	' ' . $_SESSION['CompanyRecord']['regoffice6']);
+//$pdf->addText($XPos, $YPos-$FontSize*4, $FontSize, $_SESSION['CompanyRecord']['regoffice5'] .
+//	' ' . $_SESSION['CompanyRecord']['regoffice6']);
 //$pdf->addText($XPos, $YPos-$FontSize*5, $FontSize,  _('Ph') . ': ' . $_SESSION['CompanyRecord']['telephone'] .
 //	' ' . _('Fax'). ': ' . $_SESSION['CompanyRecord']['fax']);
 //$pdf->addText($XPos, $YPos-$FontSize*6, $FontSize, $_SESSION['CompanyRecord']['email']);
@@ -85,10 +86,10 @@ $pdf->RoundRectangle(
 	10);// RoundRectangle $RadiusY.
 
 // Prints quotation info:
-$pdf->addTextWrap($Page_Width-$Right_Margin-200, $Page_Height-$Top_Margin-$FontSize*1, 200, $FontSize, _('Number'). ': '.$_GET['QuotationNo']."หกด", 'right');
-$pdf->addTextWrap($Page_Width-$Right_Margin-200, $Page_Height-$Top_Margin-$FontSize*2, 200, $FontSize, _('Your Ref'). ': '.$myrow['customerref'], 'right');
-$pdf->addTextWrap($Page_Width-$Right_Margin-200, $Page_Height-$Top_Margin-$FontSize*3, 200, $FontSize, _('Date'). ': '.ConvertSQLDate($myrow['quotedate']), 'right');
-$pdf->addTextWrap($Page_Width-$Right_Margin-200, $Page_Height-$Top_Margin-$FontSize*4, 200, $FontSize, _('Page').': '.$PageNumber, 'right');
+//$pdf->addTextWrap($Page_Width-$Right_Margin-200, $Page_Height-$Top_Margin-$FontSize*1, 200, $FontSize, _('Number'). ': '.$_GET['QuotationNo']."หกด", 'right');
+//$pdf->addTextWrap($Page_Width-$Right_Margin-200, $Page_Height-$Top_Margin-$FontSize*2, 200, $FontSize, _('Your Ref'). ': '.$myrow['customerref'], 'right');
+//$pdf->addTextWrap($Page_Width-$Right_Margin-200, $Page_Height-$Top_Margin-$FontSize*3, 200, $FontSize, _('Date'). ': '.ConvertSQLDate($myrow['quotedate']), 'right');
+//$pdf->addTextWrap($Page_Width-$Right_Margin-200, $Page_Height-$Top_Margin-$FontSize*4, 200, $FontSize, _('Page').': '.$PageNumber, 'right');
 
 $FontSize=10;
 

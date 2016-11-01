@@ -197,6 +197,9 @@ if (DB_num_rows($result)>0){
 
 		$FontSize = 10;// Font size for the line item.
 
+
+		//// Loop Line Item !!
+
 		$LeftOvers = $pdf->addText($Left_Margin, $YPos+$FontSize, $FontSize, $myrow2['stkcode']);
 		$LeftOvers = $pdf->addText(120, $YPos+$FontSize, $FontSize, $myrow2['description']);
 		$LeftOvers = $pdf->addTextWrap(180, $YPos,85,$FontSize,$DisplayQty,'right');
@@ -217,9 +220,14 @@ if (DB_num_rows($result)>0){
 			if ($YPos < ($Bottom_Margin)) {// Begins new page.
 				include('includes/PDFQuotationPortraitPageHeader.inc');
 			}
-			$LeftOvers = $pdf->addTextWrap(120, $YPos, $Width2, $FontSize2, $LeftOvers, "left");
-//			$LeftOvers = $pdf->addTextWrap(120, $YPos, $Width2, $FontSize2, "กดสฟหงาดฟวงหสกาด");
-//			$LeftOvers = $pdf->addText( 0, $Width2, $FontSize2, $LeftOvers);
+
+
+		///-- descritpion
+//		$LeftOvers = $pdf->addTextWrap2(120, $YPos, $Width2, $FontSize2, $LeftOvers, "left");
+		$LeftOvers = $pdf->addTextWrap2(120, $YPos, $Width2, $FontSize2, $LeftOvers, "left");
+//			$LeftOvers = $pdf->addTextWrap(120, $YPos - ($FontSize2), $Width2 , $FontSize2, $LeftOvers, "left");
+
+
 		}
 
 		$QuotationTotal += $LineTotal;
